@@ -1,7 +1,8 @@
 import React from "react";
-
-import { Redirect, Route, Switch } from "react-router-dom";
+import { createReservation } from "../utils/api";
+import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
+import Reservations from "../reservation/Reservation";
 import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
 
@@ -13,22 +14,38 @@ import { today } from "../utils/date-time";
  * @returns {JSX.Element}
  */
 function Routes() {
-  return (
-    <Switch>
-      <Route exact={true} path="/">
-        <Redirect to={"/dashboard"} />
-      </Route>
-      <Route exact={true} path="/reservations">
-        <Redirect to={"/dashboard"} />
-      </Route>
-      <Route path="/dashboard">
-        <Dashboard date={today()} />
-      </Route>
-      <Route>
-        <NotFound />
-      </Route>
-    </Switch>
-  );
+    const history = useHistory();
+
+    const createReservationHandler = (data) => {
+        const abortController = new AbortController();
+        createReservation(data, abortController.signal)
+            .then((e) => {
+                console.log(e);
+                history.push("/reservations");
+            })
+            .catch((err) => console.log(err.message));
+        return () => abortController.abort();
+    };
+
+    return (
+        <Switch>
+            <Route exact={true} path="/">
+                <Redirect to={"/dashboard"} />
+            </Route>
+            <Route exact={true} path="/reservations">
+                <Redirect to={"/dashboard"} />
+            </Route>
+            <Route path="/reservations/new">
+                <Reservations submitHandler={createReservationHandler} />
+            </Route>
+            <Route path="/dashboard">
+                <Dashboard date={today()} />
+            </Route>
+            <Route>
+                <NotFound />
+            </Route>
+        </Switch>
+    );
 }
 
 export default Routes;
