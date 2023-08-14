@@ -1,22 +1,53 @@
 import React from "react";
 import { useState } from "react";
+import { useHistory } from "react-router-dom";
 
-export default function Reservation({ submitHandler }) {
+export default function Reservation({ submitHandler, date }) {
+    const history = useHistory();
+    const [error, setError] = useState(null);
+
     const initialFormData = {
         first_name: "",
         last_name: "",
         mobile_number: "",
         reservation_date: "",
         reservation_time: "",
-        people: 1,
+        people: "",
     };
     const [formData, setFormData] = useState(initialFormData);
 
     const handleInput = (event) => {
-        setFormData({
-            ...formData,
-            [event.target.name]: event.target.value,
-        });
+        if (event.target.name === "reservation_date") {
+            const resDate = new Date(event.target.value);
+            const todayDate = new Date(date);
+            setError(null);
+            if (resDate < todayDate) {
+                setError("Reservation cannot be made in the past");
+            }
+            if (resDate.getUTCDay() === 2) {
+                setError("Restaurant is closed on Tuesdays");
+            }
+            if (resDate < todayDate && resDate.getUTCDay() === 2) {
+                setError(
+                    "Reservation cannot be made in the past and Restaurant is closed on Tuesdays"
+                );
+            }
+        }
+        if (event.target.name === "people") {
+            if (Number.isNaN(event.target.value)) {
+                setError("people is not a number");
+            } else {
+                setFormData({
+                    ...formData,
+                    [event.target.name]: Number(event.target.value),
+                });
+            }
+        } else {
+            setFormData({
+                ...formData,
+                [event.target.name]: event.target.value,
+            });
+        }
     };
 
     // const handleSubmit = (formData) => {
@@ -36,8 +67,14 @@ export default function Reservation({ submitHandler }) {
         setFormData({ ...initialFormData });
     };
 
+    const cancelButton = (e) => {
+        history.push("/dashboard");
+    };
+
     return (
         <div>
+            {error && <div className="alert alert-danger mt-4">{error}</div>}
+
             <form className="mb-3" onSubmit={handleFormSubmit}>
                 <label htmlFor="first_name" className="form-label mt-2">
                     First Name
@@ -96,13 +133,19 @@ export default function Reservation({ submitHandler }) {
                     name="people"
                     type="number"
                     className="form-control"
+                    pattern="[1-9]+"
                     value={formData.people}
                     onChange={handleInput}
                 ></input>
                 <button type="submit" className="btn btn-primary mr-5 mt-3">
                     Submit
                 </button>
-                <button className="btn btn-danger mt-3">Cancel</button>
+                <button
+                    className="btn btn-danger mt-3"
+                    onClick={() => cancelButton()}
+                >
+                    Cancel
+                </button>
             </form>
         </div>
     );

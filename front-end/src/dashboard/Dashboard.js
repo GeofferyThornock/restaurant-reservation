@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import useQuery from "../utils/useQuery";
 import ReservationList from "./reservationList";
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
@@ -9,9 +10,22 @@ import ErrorAlert from "../layout/ErrorAlert";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
+function Dashboard({ defaultDate }) {
+    const query = useQuery();
+
     const [reservations, setReservations] = useState([]);
     const [reservationsError, setReservationsError] = useState(null);
+    const [date, setDate] = useState(defaultDate);
+
+    useEffect(() => {
+        const dateCheck = query.get("date");
+        console.log(dateCheck, "dates");
+        if (dateCheck) {
+            setDate(dateCheck);
+        } else {
+            setDate(defaultDate);
+        }
+    }, [query, defaultDate]);
 
     useEffect(loadDashboard, [date]);
 

@@ -20,8 +20,7 @@ function Routes() {
         const abortController = new AbortController();
         createReservation(data, abortController.signal)
             .then((e) => {
-                console.log(e);
-                history.push("/reservations");
+                history.push(`/dashboard?date=${data.reservation_date}`);
             })
             .catch((err) => console.log(err.message));
         return () => abortController.abort();
@@ -35,11 +34,14 @@ function Routes() {
             <Route exact={true} path="/reservations">
                 <Redirect to={"/dashboard"} />
             </Route>
-            <Route path="/reservations/new">
-                <Reservations submitHandler={createReservationHandler} />
-            </Route>
             <Route path="/dashboard">
-                <Dashboard date={today()} />
+                <Dashboard defaultDate={today()} />
+            </Route>
+            <Route path="/reservations/new">
+                <Reservations
+                    submitHandler={createReservationHandler}
+                    date={today()}
+                />
             </Route>
             <Route>
                 <NotFound />
