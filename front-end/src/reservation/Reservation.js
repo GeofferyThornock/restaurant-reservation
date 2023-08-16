@@ -1,19 +1,20 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
-export default function Reservation({ submitHandler, date }) {
+export default function Reservation({
+    submitHandler,
+    initialFormData,
+    date,
+    errors,
+}) {
     const history = useHistory();
     const [error, setError] = useState(null);
 
-    const initialFormData = {
-        first_name: "",
-        last_name: "",
-        mobile_number: "",
-        reservation_date: "",
-        reservation_time: "",
-        people: "",
-    };
+    useEffect(() => {
+        setError(errors);
+    }, [errors]);
+
     const [formData, setFormData] = useState(initialFormData);
 
     const handleInput = (event) => {

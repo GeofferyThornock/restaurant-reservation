@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { createReservation } from "../utils/api";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
@@ -15,14 +15,34 @@ import { today } from "../utils/date-time";
  */
 function Routes() {
     const history = useHistory();
+    const [error, setError] = useState(null);
+
+    const initialFormData = {
+        first_name: "",
+        last_name: "",
+        mobile_number: "",
+        reservation_date: "",
+        reservation_time: "",
+        people: "",
+    };
 
     const createReservationHandler = (data) => {
         const abortController = new AbortController();
+
+        const time = Number(data.reservation_time.replace(":", ""));
+        console.log(time);
+        if (time >= 2200 || time <= 1030) {
+            setError("Must pick a time during work hours");
+            return;
+        }
+
+        setError(null);
         createReservation(data, abortController.signal)
             .then((e) => {
                 history.push(`/dashboard?date=${data.reservation_date}`);
             })
-            .catch((err) => console.log(err.message));
+            .catch();
+
         return () => abortController.abort();
     };
 
@@ -40,7 +60,10 @@ function Routes() {
             <Route path="/reservations/new">
                 <Reservations
                     submitHandler={createReservationHandler}
+                    initialFormData={initialFormData}
                     date={today()}
+                    errors={error}
+                    setErrors={setError}
                 />
             </Route>
             <Route>

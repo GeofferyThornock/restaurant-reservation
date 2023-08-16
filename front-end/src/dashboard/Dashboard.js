@@ -19,7 +19,6 @@ function Dashboard({ defaultDate }) {
 
     useEffect(() => {
         const dateCheck = query.get("date");
-        console.log(dateCheck, "dates");
         if (dateCheck) {
             setDate(dateCheck);
         } else {
