@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import useQuery from "../utils/useQuery";
+import ReservationList from "./reservationList";
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
@@ -8,31 +10,48 @@ import ErrorAlert from "../layout/ErrorAlert";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
-  const [reservations, setReservations] = useState([]);
-  const [reservationsError, setReservationsError] = useState(null);
+function Dashboard({ defaultDate }) {
+    const query = useQuery();
 
-  useEffect(loadDashboard, [date]);
+    const [reservations, setReservations] = useState([]);
+    const [reservationsError, setReservationsError] = useState(null);
+    const [date, setDate] = useState(defaultDate);
 
-  function loadDashboard() {
-    const abortController = new AbortController();
-    setReservationsError(null);
-    listReservations({ date }, abortController.signal)
-      .then(setReservations)
-      .catch(setReservationsError);
-    return () => abortController.abort();
-  }
+    useEffect(() => {
+        const dateCheck = query.get("date");
+        if (dateCheck) {
+            setDate(dateCheck);
+        } else {
+            setDate(defaultDate);
+        }
+    }, [query, defaultDate]);
 
-  return (
-    <main>
-      <h1>Dashboard</h1>
-      <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations for date</h4>
-      </div>
-      <ErrorAlert error={reservationsError} />
-      {JSON.stringify(reservations)}
-    </main>
-  );
+    useEffect(loadDashboard, [date]);
+
+    function loadDashboard() {
+        const abortController = new AbortController();
+        setReservationsError(null);
+        listReservations({ date }, abortController.signal)
+            .then(setReservations)
+            .catch(setReservationsError);
+        return () => abortController.abort();
+    }
+
+    return (
+        <main>
+            <h1>Dashboard</h1>
+            <div className="d-md-flex mb-3">
+                <h4 className="mb-0">Reservations for date</h4>
+            </div>
+            <ErrorAlert error={reservationsError} />
+            <div className="d-md-flex m-2">
+                {reservations &&
+                    reservations.map((e) => (
+                        <ReservationList reservation={e} />
+                    ))}
+            </div>
+        </main>
+    );
 }
 
 export default Dashboard;
