@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { createReservation } from "../utils/api";
+import { createReservation, createTable, assign } from "../utils/api";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
 import Reservations from "../reservation/Reservation";
 import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
+import CreateTables from "../tables/CreateTables";
+import Seating from "../reservation/Seating";
 
 /**
  * Defines all the routes for the application.
@@ -30,7 +32,6 @@ function Routes() {
         const abortController = new AbortController();
 
         const time = Number(data.reservation_time.replace(":", ""));
-        console.log(time);
         if (time >= 2200 || time <= 1030) {
             setError("Must pick a time during work hours");
             return;
@@ -39,7 +40,32 @@ function Routes() {
         setError(null);
         createReservation(data, abortController.signal)
             .then((e) => {
+                console.log(e);
                 history.push(`/dashboard?date=${data.reservation_date}`);
+            })
+            .catch();
+
+        return () => abortController.abort();
+    };
+
+    const createTableHandler = (data) => {
+        const abortController = new AbortController();
+
+        createTable(data, abortController.signal)
+            .then((e) => {
+                history.push(`/dashboard`);
+            })
+            .catch();
+
+        return () => abortController.abort();
+    };
+
+    const assignSeat = (data) => {
+        const abortController = new AbortController();
+        console.log(data);
+        assign(data, abortController.signal)
+            .then((e) => {
+                history.push(`/dashboard`);
             })
             .catch();
 
@@ -65,6 +91,12 @@ function Routes() {
                     errors={error}
                     setErrors={setError}
                 />
+            </Route>
+            <Route path="/reservations/:reservationId/seat">
+                <Seating submitHandler={assignSeat} />
+            </Route>
+            <Route path="/tables/new">
+                <CreateTables submitHandler={createTableHandler} />
             </Route>
             <Route>
                 <NotFound />

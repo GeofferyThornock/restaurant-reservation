@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import useQuery from "../utils/useQuery";
 import ReservationList from "./reservationList";
-import { listReservations } from "../utils/api";
+import { listReservations, listTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
+import TablesList from "./tablesList";
 
 /**
  * Defines the dashboard page.
@@ -14,6 +15,7 @@ function Dashboard({ defaultDate }) {
     const query = useQuery();
 
     const [reservations, setReservations] = useState([]);
+    const [tables, setTables] = useState([]);
     const [reservationsError, setReservationsError] = useState(null);
     const [date, setDate] = useState(defaultDate);
 
@@ -34,6 +36,9 @@ function Dashboard({ defaultDate }) {
         listReservations({ date }, abortController.signal)
             .then(setReservations)
             .catch(setReservationsError);
+        listTables(abortController.signal)
+            .then(setTables)
+            .catch(setReservationsError);
         return () => abortController.abort();
     }
 
@@ -49,6 +54,9 @@ function Dashboard({ defaultDate }) {
                     reservations.map((e) => (
                         <ReservationList reservation={e} />
                     ))}
+            </div>
+            <div className="p-2 d-flex flex-xl-nowrap flex-wrap">
+                {tables && tables.map((e) => <TablesList tables={e} />)}
             </div>
         </main>
     );

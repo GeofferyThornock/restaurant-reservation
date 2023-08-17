@@ -1,7 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function ReservationList({ reservation }) {
     const {
+        reservation_id,
         first_name,
         last_name,
         mobile_number,
@@ -22,6 +24,13 @@ export default function ReservationList({ reservation }) {
             <p>Reservation Time: {reservation_time}</p>
 
             <p>Party Size: {people}</p>
+
+            <Link
+                to={`/reservations/${reservation_id}/seat`}
+                className="btn btn-primary px-5"
+            >
+                Seat
+            </Link>
         </div>
     );
 }
