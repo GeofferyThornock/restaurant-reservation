@@ -27,10 +27,13 @@ function validator(field) {
 }
 
 function dateValidation(req, res, next) {
-    const { reservation_date } = req.body.data;
-    const date = new Date(reservation_date);
+    const { reservation_date, reservation_time } = req.body.data;
+    const time = reservation_time.split(":");
+    const day = reservation_date.split("-");
+    const date = new Date(Date.parse(reservation_date));
+    date.setHours(time[0], time[1]);
+    date.setDate(Number(day[2]));
     const todayDate = new Date();
-    console.log(date, todayDate);
 
     if (date.getUTCDay() === 2) {
         next({
@@ -38,8 +41,7 @@ function dateValidation(req, res, next) {
             message: `restaurant is closed`,
         });
     }
-
-    if (date < todayDate) {
+    if (date.toJSON() < todayDate.toJSON()) {
         next({
             status: 400,
             message: `date needs to be in the future`,
