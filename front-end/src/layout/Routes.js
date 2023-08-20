@@ -7,6 +7,7 @@ import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
 import CreateTables from "../tables/CreateTables";
 import Seating from "../reservation/Seating";
+import Search from "../search/Search";
 
 /**
  * Defines all the routes for the application.
@@ -92,8 +93,11 @@ function Routes() {
                     setErrors={setError}
                 />
             </Route>
-            <Route path="/reservations/:reservationId/seat">
+            <Route path="/reservations/:reservation_id/seat">
                 <Seating submitHandler={assignSeat} />
+            </Route>
+            <Route path="/search">
+                <Search />
             </Route>
             <Route path="/tables/new">
                 <CreateTables submitHandler={createTableHandler} />

@@ -11,10 +11,19 @@ export default function CreateTables({ submitHandler }) {
     const [formData, setFormData] = useState(initialFormData);
 
     const handleInput = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+        console.log(formData);
+        if (e.target.name === "capacity") {
+            console.log(e.target.value);
+            setFormData({
+                ...formData,
+                [e.target.name]: Number(e.target.value),
+            });
+        } else {
+            setFormData({
+                ...formData,
+                [e.target.name]: e.target.value,
+            });
+        }
     };
 
     const handleFormSubmit = (e) => {
@@ -26,7 +35,7 @@ export default function CreateTables({ submitHandler }) {
     };
 
     const cancelButton = (e) => {
-        history.push("/dashboard");
+        history.goBack();
     };
 
     return (
@@ -39,6 +48,7 @@ export default function CreateTables({ submitHandler }) {
                     name="table_name"
                     className="form-control"
                     value={formData.table_name}
+                    minLength="2"
                     onChange={handleInput}
                 ></input>
                 <label htmlFor="capacity" className="form-label mt-3">

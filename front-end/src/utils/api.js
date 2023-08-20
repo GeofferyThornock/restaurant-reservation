@@ -115,3 +115,39 @@ export async function assign(data, signal) {
 
     return await fetchJson(url, options, data);
 }
+
+export async function changeStatus(data, signal) {
+    const url = new URL(
+        `${API_BASE_URL}/reservations/${data.reservation_id}/status`
+    );
+    const options = {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ data }),
+        signal,
+    };
+
+    return await fetchJson(url, options, data);
+}
+
+export async function findReservation(id, signal) {
+    const url = new URL(`${API_BASE_URL}/reservations/${id}`);
+    return await fetchJson(url, { headers, signal }, id);
+}
+
+export async function searchReservations(mobile_number, signal) {
+    const url = new URL(`${API_BASE_URL}/reservations`);
+    url.searchParams.append("mobile_number", mobile_number);
+    return await fetchJson(url, { headers, signal }, []);
+}
+
+export async function finishTable(data, signal) {
+    const url = new URL(`${API_BASE_URL}/tables/${data.table_id}/seat`);
+    const options = {
+        method: "DELETE",
+        headers,
+        body: JSON.stringify({ data }),
+        signal,
+    };
+    return await fetchJson(url, options, data);
+}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useQuery from "../utils/useQuery";
 import ReservationList from "./reservationList";
-import { listReservations, listTables } from "../utils/api";
+import { listReservations, listTables, finishTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import TablesList from "./tablesList";
 
@@ -42,6 +42,16 @@ function Dashboard({ defaultDate }) {
         return () => abortController.abort();
     }
 
+    const finishHandler = (data) => {
+        const abortController = new AbortController();
+        console.log(data);
+        finishTable(data, abortController.signal)
+            .then(loadDashboard)
+            .catch(setReservationsError);
+
+        return () => abortController.abort();
+    };
+
     return (
         <main>
             <h1>Dashboard</h1>
@@ -51,12 +61,29 @@ function Dashboard({ defaultDate }) {
             <ErrorAlert error={reservationsError} />
             <div className="d-md-flex m-2">
                 {reservations &&
-                    reservations.map((e) => (
-                        <ReservationList reservation={e} />
-                    ))}
+                    // eslint-disable-next-line array-callback-return
+                    reservations.map((e) => {
+                        if (e.status !== "finished") {
+                            return (
+                                <ReservationList
+                                    reservation={e}
+                                    key={e.reservation_id}
+                                />
+                            );
+                        } else {
+                            return null;
+                        }
+                    })}
             </div>
             <div className="p-2 d-flex flex-xl-nowrap flex-wrap">
-                {tables && tables.map((e) => <TablesList tables={e} />)}
+                {tables &&
+                    tables.map((e) => (
+                        <TablesList
+                            table={e}
+                            key={e.table_id}
+                            finishHandler={finishHandler}
+                        />
+                    ))}
             </div>
         </main>
     );
