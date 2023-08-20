@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import useQuery from "../utils/useQuery";
 import ReservationList from "./reservationList";
-import { listReservations } from "../utils/api";
+import { listReservations, listTables, finishTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
+import TablesList from "./tablesList";
 
 /**
  * Defines the dashboard page.
@@ -14,6 +15,7 @@ function Dashboard({ defaultDate }) {
     const query = useQuery();
 
     const [reservations, setReservations] = useState([]);
+    const [tables, setTables] = useState([]);
     const [reservationsError, setReservationsError] = useState(null);
     const [date, setDate] = useState(defaultDate);
 
@@ -34,8 +36,21 @@ function Dashboard({ defaultDate }) {
         listReservations({ date }, abortController.signal)
             .then(setReservations)
             .catch(setReservationsError);
+        listTables(abortController.signal)
+            .then(setTables)
+            .catch(setReservationsError);
         return () => abortController.abort();
     }
+
+    const finishHandler = (data) => {
+        const abortController = new AbortController();
+        console.log(data);
+        finishTable(data, abortController.signal)
+            .then(loadDashboard)
+            .catch(setReservationsError);
+
+        return () => abortController.abort();
+    };
 
     return (
         <main>
@@ -46,8 +61,28 @@ function Dashboard({ defaultDate }) {
             <ErrorAlert error={reservationsError} />
             <div className="d-md-flex m-2">
                 {reservations &&
-                    reservations.map((e) => (
-                        <ReservationList reservation={e} />
+                    // eslint-disable-next-line array-callback-return
+                    reservations.map((e) => {
+                        if (e.status !== "finished") {
+                            return (
+                                <ReservationList
+                                    reservation={e}
+                                    key={e.reservation_id}
+                                />
+                            );
+                        } else {
+                            return null;
+                        }
+                    })}
+            </div>
+            <div className="p-2 d-flex flex-xl-nowrap flex-wrap">
+                {tables &&
+                    tables.map((e) => (
+                        <TablesList
+                            table={e}
+                            key={e.table_id}
+                            finishHandler={finishHandler}
+                        />
                     ))}
             </div>
         </main>
