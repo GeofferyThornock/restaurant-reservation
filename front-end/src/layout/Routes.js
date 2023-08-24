@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { createTable, assign } from "../utils/api";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import Dashboard from "../dashboard/Dashboard";
@@ -19,7 +19,6 @@ import CreateReservation from "../reservation/CreateReservation";
  */
 function Routes() {
     const history = useHistory();
-    const [error, setError] = useState(null);
 
     const createTableHandler = (data) => {
         const abortController = new AbortController();
@@ -54,23 +53,14 @@ function Routes() {
                 <Redirect to={"/dashboard"} />
             </Route>
             <Route exact={true} path="/reservations/new">
-                <CreateReservation
-                    date={today()}
-                    errors={error}
-                    setErrors={setError}
-                />
+                <CreateReservation date={today()} />
             </Route>
             <Route exact={true} path="/reservations/:reservation_id/edit">
-                <EditReservation
-                    date={today()}
-                    errors={error}
-                    setErrors={setError}
-                />
+                <EditReservation date={today()} />
             </Route>
             <Route exact={true} path="/reservations/:reservation_id/seat">
                 <Seating submitHandler={assignSeat} />
             </Route>
-
             <Route exact={true} path="/search">
                 <Search />
             </Route>

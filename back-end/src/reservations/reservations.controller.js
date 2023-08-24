@@ -236,7 +236,7 @@ module.exports = {
         dateValidation,
         numberValidation,
         stateValidation,
-        create,
+        asyncErrorBoundary(create),
     ],
     read: [asyncErrorBoundary(reservationExists), asyncErrorBoundary(read)],
     update: [

@@ -5,7 +5,6 @@ import { useHistory } from "react-router-dom";
 export default function Reservation({
     submitHandler,
     initialFormData,
-    date,
     error,
     setError,
 }) {
@@ -17,7 +16,7 @@ export default function Reservation({
         setError(null);
         if (event.target.name === "reservation_date") {
             const resDate = new Date(event.target.value);
-            const todayDate = new Date(date);
+            const todayDate = new Date();
 
             if (resDate < todayDate) {
                 setError({ message: "Reservation cannot be made in the past" });
@@ -56,10 +55,15 @@ export default function Reservation({
 
         if (time >= 2200 || time <= 1030) {
             setError({ message: "Must pick a time during work hours" });
+            console.log(error.message);
             return;
         }
 
-        submitHandler(formData);
+        if (error) {
+            console.log(error.message);
+        } else {
+            submitHandler(formData);
+        }
 
         setFormData({ ...initialFormData });
     };
@@ -98,6 +102,7 @@ export default function Reservation({
                     name="mobile_number"
                     className="form-control"
                     placeholder="Phone Number"
+                    pattern="^[0-9 -]+$"
                     value={formData.mobile_number}
                     onChange={handleInput}
                 ></input>

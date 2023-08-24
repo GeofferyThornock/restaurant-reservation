@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import Reservation from "./Reservation";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function CreateReservation({ date, errors, setErrors }) {
+export default function CreateReservation() {
     const history = useHistory();
     const initialFormData = {
         first_name: "",
@@ -18,7 +18,7 @@ export default function CreateReservation({ date, errors, setErrors }) {
 
     const createReservationHandler = (data) => {
         const abortController = new AbortController();
-
+        console.log(error);
         createReservation(data, abortController.signal)
             .then((e) => {
                 history.push(`/dashboard?date=${data.reservation_date}`);
@@ -34,7 +34,6 @@ export default function CreateReservation({ date, errors, setErrors }) {
             <Reservation
                 submitHandler={createReservationHandler}
                 initialFormData={initialFormData}
-                date={date}
                 error={error}
                 setError={setError}
             />

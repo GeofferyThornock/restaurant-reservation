@@ -7,11 +7,12 @@ import { findReservation, updateReservation } from "../utils/api";
 import Reservation from "./Reservation";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function EditReservation({ date }) {
+export default function EditReservation() {
     const { reservation_id } = useParams();
     const [reservation, setReservation] = useState({});
     const [error, setError] = useState(null);
     const history = useHistory();
+
     useEffect(() => {
         const abortController = new AbortController();
 
@@ -24,7 +25,7 @@ export default function EditReservation({ date }) {
 
     const submitHandler = (data) => {
         const abortController = new AbortController();
-
+        console.log(error);
         updateReservation(reservation_id, data, abortController.signal)
             .then((e) => {
                 history.push(`/dashboard?date=${data.reservation_date}`);
@@ -48,7 +49,6 @@ export default function EditReservation({ date }) {
                         reservation_time: reservation.reservation_time,
                         people: reservation.people,
                     }}
-                    date={date}
                     error={error}
                     setError={setError}
                 />
