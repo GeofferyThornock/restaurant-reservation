@@ -53,32 +53,32 @@ function Routes() {
             <Route exact={true} path="/reservations">
                 <Redirect to={"/dashboard"} />
             </Route>
-            <Route path="/dashboard">
-                <Dashboard defaultDate={today()} />
-            </Route>
-            <Route path="/reservations/new">
+            <Route exact={true} path="/reservations/new">
                 <CreateReservation
                     date={today()}
                     errors={error}
                     setErrors={setError}
                 />
             </Route>
-            <Route path="/reservations/:reservation_id/edit">
+            <Route exact={true} path="/reservations/:reservation_id/edit">
                 <EditReservation
                     date={today()}
                     errors={error}
                     setErrors={setError}
                 />
             </Route>
-            <Route path="/reservations/:reservation_id/seat">
+            <Route exact={true} path="/reservations/:reservation_id/seat">
                 <Seating submitHandler={assignSeat} />
             </Route>
 
-            <Route path="/search">
+            <Route exact={true} path="/search">
                 <Search />
             </Route>
-            <Route path="/tables/new">
+            <Route exact={true} path="/tables/new">
                 <CreateTables submitHandler={createTableHandler} />
+            </Route>
+            <Route path="/dashboard">
+                <Dashboard defaultDate={today()} />
             </Route>
             <Route>
                 <NotFound />
