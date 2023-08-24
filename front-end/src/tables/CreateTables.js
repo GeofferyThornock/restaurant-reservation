@@ -11,9 +11,7 @@ export default function CreateTables({ submitHandler }) {
     const [formData, setFormData] = useState(initialFormData);
 
     const handleInput = (e) => {
-        console.log(formData);
         if (e.target.name === "capacity") {
-            console.log(e.target.value);
             setFormData({
                 ...formData,
                 [e.target.name]: Number(e.target.value),

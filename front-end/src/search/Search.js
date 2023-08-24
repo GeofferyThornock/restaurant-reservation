@@ -17,13 +17,11 @@ export default function Search() {
         });
     };
 
-    const searchHandler = (e) => {
-        e.preventDefault();
+    const reloadHandler = () => {
         const abortController = new AbortController();
 
         searchReservations(formData.mobile_number, abortController.signal)
             .then((e) => {
-                console.log(e);
                 if (e.length) {
                     setReservations(e);
                     setText({});
@@ -34,7 +32,25 @@ export default function Search() {
             })
             .catch(setErr);
 
-        console.log(reservations);
+        return () => abortController.abort();
+    };
+
+    const searchHandler = (e) => {
+        e.preventDefault();
+        const abortController = new AbortController();
+
+        searchReservations(formData.mobile_number, abortController.signal)
+            .then((e) => {
+                if (e.length) {
+                    setReservations(e);
+                    setText({});
+                } else {
+                    setReservations([]);
+                    setText({ message: "No reservations found" });
+                }
+            })
+            .catch(setErr);
+
         return () => abortController.abort();
     };
     return (
@@ -58,7 +74,11 @@ export default function Search() {
             <div className="d-md-flex m-2 flex-wrap">
                 {reservations &&
                     reservations.map((e) => (
-                        <ReservationList reservation={e} />
+                        <ReservationList
+                            key={e.reservation_id}
+                            reservation={e}
+                            reloadHandler={reloadHandler}
+                        />
                     ))}
                 {text && <p>{text.message}</p>}
             </div>

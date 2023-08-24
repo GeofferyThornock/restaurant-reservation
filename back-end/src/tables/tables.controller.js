@@ -179,12 +179,12 @@ async function finish(req, res) {
 }
 
 module.exports = {
-    list,
+    list: [asyncErrorBoundary(list)],
     create: [
         ...VALID_PROPERTIES.map(validator),
         tableNameLength,
         numberCheck,
-        create,
+        asyncErrorBoundary(create),
     ],
     update: [
         ["reservation_id"].map(validator),
@@ -193,7 +193,11 @@ module.exports = {
         tableCapacity,
         tableOccupied,
         statusNotSeated,
-        update,
+        asyncErrorBoundary(update),
     ],
-    finish: [asyncErrorBoundary(tableExists), tableNotOccupied, finish],
+    finish: [
+        asyncErrorBoundary(tableExists),
+        tableNotOccupied,
+        asyncErrorBoundary(finish),
+    ],
 };

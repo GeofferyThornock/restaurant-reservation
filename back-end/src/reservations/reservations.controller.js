@@ -52,7 +52,6 @@ function dateValidation(req, res, next) {
 
     date.setHours(time[0], time[1]);
     const todayDate = new Date();
-    console.log(date.getDay(), Number(day[2]), date);
 
     if (date.toJSON() < todayDate.toJSON()) {
         next({
@@ -91,7 +90,6 @@ function numberValidation(req, res, next) {
 
 function timeValidation(req, res, next) {
     const { reservation_time } = req.body.data;
-    console.log(reservation_time);
     if (reservation_time.toString() !== "not-a-time") {
         next();
     } else {
@@ -167,7 +165,6 @@ END OF VALIDATORS
 async function list(req, res) {
     if (req.query.mobile_number) {
         const mobile_number = JSON.stringify(req.query.mobile_number);
-        console.log("MOBILE", mobile_number);
         const response = await service.search(mobile_number);
         res.json({ data: response });
     } else {
@@ -204,15 +201,12 @@ async function create(req, res) {
 
     const data = await service.create(newReservation);
 
-    console.log(data);
-
     res.status(201).json({ data });
 }
 
 async function update(req, res) {
     const { status } = req.body.data;
     const { reservation_id } = res.locals.reservation;
-    console.log(status, reservation_id);
     const response = await service.update(reservation_id, status);
     res.json({ data: response });
 }
@@ -234,7 +228,7 @@ async function updateReservation(req, res) {
 }
 
 module.exports = {
-    list,
+    list: [asyncErrorBoundary(list)],
     create: [
         ...VALID_PROPERTIES.map(validator),
         validateTime,
@@ -249,7 +243,7 @@ module.exports = {
         asyncErrorBoundary(reservationExists),
         updateStatus,
         finishValidation,
-        update,
+        asyncErrorBoundary(update),
     ],
     updateReservation: [
         ...VALID_PROPERTIES.map(validator),
@@ -258,6 +252,6 @@ module.exports = {
         dateValidation,
         numberValidation,
         stateValidation,
-        updateReservation,
+        asyncErrorBoundary(updateReservation),
     ],
 };

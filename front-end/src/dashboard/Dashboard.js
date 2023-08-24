@@ -44,7 +44,7 @@ function Dashboard({ defaultDate }) {
 
     const finishHandler = (data) => {
         const abortController = new AbortController();
-        console.log(data);
+
         finishTable(data, abortController.signal)
             .then(loadDashboard)
             .catch(setReservationsError);
@@ -68,6 +68,7 @@ function Dashboard({ defaultDate }) {
                                 <ReservationList
                                     reservation={e}
                                     key={e.reservation_id}
+                                    reloadHandler={loadDashboard}
                                 />
                             );
                         } else {

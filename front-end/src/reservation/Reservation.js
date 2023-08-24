@@ -1,37 +1,35 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useHistory } from "react-router-dom";
 
 export default function Reservation({
     submitHandler,
     initialFormData,
     date,
-    errors,
+    error,
+    setError,
 }) {
     const history = useHistory();
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        setError(errors);
-    }, [errors]);
 
     const [formData, setFormData] = useState(initialFormData);
 
     const handleInput = (event) => {
+        setError(null);
         if (event.target.name === "reservation_date") {
             const resDate = new Date(event.target.value);
             const todayDate = new Date(date);
-            setError(null);
+
             if (resDate < todayDate) {
-                setError("Reservation cannot be made in the past");
+                setError({ message: "Reservation cannot be made in the past" });
             }
             if (resDate.getUTCDay() === 2) {
-                setError("Restaurant is closed on Tuesdays");
+                setError({ message: "Restaurant is closed on Tuesdays" });
             }
             if (resDate < todayDate && resDate.getUTCDay() === 2) {
-                setError(
-                    "Reservation cannot be made in the past and Restaurant is closed on Tuesdays"
-                );
+                setError({
+                    message:
+                        "Reservation cannot be made in the past and Restaurant is closed on Tuesdays",
+                });
             }
         }
         if (event.target.name === "people") {
@@ -51,17 +49,15 @@ export default function Reservation({
         }
     };
 
-    // const handleSubmit = (formData) => {
-    //     console.log(formData);
-    //     const abortController = new AbortController();
-    //     createReservation(formData, abortController).then((e) => {
-    //         history.push("/reservations");
-    //     });
-    //     return () => abortController.abort();
-    // };
-
     const handleFormSubmit = (e) => {
         e.preventDefault();
+
+        const time = Number(formData.reservation_time.replace(":", ""));
+
+        if (time >= 2200 || time <= 1030) {
+            setError({ message: "Must pick a time during work hours" });
+            return;
+        }
 
         submitHandler(formData);
 
@@ -69,13 +65,11 @@ export default function Reservation({
     };
 
     const cancelButton = (e) => {
-        history.push("/dashboard");
+        history.goBack();
     };
 
     return (
         <div>
-            {error && <div className="alert alert-danger mt-4">{error}</div>}
-
             <form className="mb-3" onSubmit={handleFormSubmit}>
                 <label htmlFor="first_name" className="form-label mt-2">
                     First Name
