@@ -24,7 +24,7 @@ export default function Seating({ submitHandler }) {
 
     const submitSeatingHandler = (e) => {
         e.preventDefault();
-        console.log(reservation.capacity, option.capacity);
+
         if (reservation.capacity < option.capacity) {
             setError({ message: "cannot seat here" });
             return;
@@ -47,7 +47,7 @@ export default function Seating({ submitHandler }) {
                 onChange={(e) => setOption(e.target.value)}
             >
                 {tables.map((e) => (
-                    <option value={e.table_id}>
+                    <option value={e.table_id} key={e.table_id}>
                         {e.table_name} - {e.capacity}
                     </option>
                 ))}

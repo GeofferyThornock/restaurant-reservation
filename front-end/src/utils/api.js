@@ -82,7 +82,7 @@ export async function createReservation(data, signal) {
         body: JSON.stringify({ data }),
         signal,
     };
-    console.log(JSON.stringify(data), "create");
+
     return await fetchJson(url, options, {});
 }
 
@@ -105,7 +105,7 @@ export async function createTable(data, signal) {
 
 export async function assign(data, signal) {
     const url = new URL(`${API_BASE_URL}/tables/${data.option}/seat`);
-    console.log(data);
+
     const options = {
         method: "PUT",
         headers,
@@ -123,7 +123,7 @@ export async function changeStatus(data, signal) {
     const options = {
         method: "PUT",
         headers,
-        body: JSON.stringify({ data }),
+        body: JSON.stringify({ data: { status: data.status } }),
         signal,
     };
 
@@ -132,7 +132,20 @@ export async function changeStatus(data, signal) {
 
 export async function findReservation(id, signal) {
     const url = new URL(`${API_BASE_URL}/reservations/${id}`);
-    return await fetchJson(url, { headers, signal }, id);
+    return await fetchJson(url, { headers, signal }, id)
+        .then(formatReservationDate)
+        .then(formatReservationTime);
+}
+
+export async function updateReservation(id, data, signal) {
+    const url = new URL(`${API_BASE_URL}/reservations/${id}`);
+    const options = {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ data }),
+        signal,
+    };
+    return await fetchJson(url, options, {});
 }
 
 export async function searchReservations(mobile_number, signal) {

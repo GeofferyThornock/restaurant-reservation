@@ -45,21 +45,24 @@ function dateValidation(req, res, next) {
     const { reservation_date, reservation_time } = req.body.data;
     const time = reservation_time.split(":");
     const day = reservation_date.split("-");
-    const date = new Date(Date.parse(reservation_date));
-    date.setHours(time[0], time[1]);
+    const date = new Date(reservation_date);
+    date.setFullYear(Number(day[0]));
     date.setDate(Number(day[2]));
+    date.setMonth(Number(day[1]) - 1);
+
+    date.setHours(time[0], time[1]);
     const todayDate = new Date();
 
-    if (date.getUTCDay() === 2) {
-        next({
-            status: 400,
-            message: `restaurant is closed`,
-        });
-    }
     if (date.toJSON() < todayDate.toJSON()) {
         next({
             status: 400,
             message: `date needs to be in the future`,
+        });
+    }
+    if (date.getDay() === 2) {
+        next({
+            status: 400,
+            message: `restaurant is closed`,
         });
     }
 
@@ -135,6 +138,22 @@ function updateStatus(req, res, next) {
     }
 }
 
+function validateTime(req, res, next) {
+    const time = req.body.data.reservation_time;
+    const selectedTime = new Date(`1970-01-01T${time}`);
+    const earliestTime = new Date(`1970-01-01T10:30:00`);
+    const latestTime = new Date(`1970-01-01T21:30:00`);
+
+    if (selectedTime < earliestTime || selectedTime > latestTime) {
+        return next({
+            status: 400,
+            message: "Please choose a time within business hours.",
+        });
+    } else {
+        next();
+    }
+}
+
 /* 
 
 
@@ -146,7 +165,6 @@ END OF VALIDATORS
 async function list(req, res) {
     if (req.query.mobile_number) {
         const mobile_number = JSON.stringify(req.query.mobile_number);
-        console.log("MOBILE", mobile_number);
         const response = await service.search(mobile_number);
         res.json({ data: response });
     } else {
@@ -189,7 +207,6 @@ async function create(req, res) {
 async function update(req, res) {
     const { status } = req.body.data;
     const { reservation_id } = res.locals.reservation;
-    console.log(status, reservation_id);
     const response = await service.update(reservation_id, status);
     res.json({ data: response });
 }
@@ -200,21 +217,41 @@ async function read(req, res) {
     res.json({ data: response });
 }
 
+async function updateReservation(req, res) {
+    const updatedReservation = {
+        ...res.locals.reservation,
+        ...req.body.data,
+        reservation_id: res.locals.reservation.reservation_id,
+    };
+    const data = await service.updateReservation(updatedReservation);
+    res.json({ data });
+}
+
 module.exports = {
-    list,
+    list: [asyncErrorBoundary(list)],
     create: [
         ...VALID_PROPERTIES.map(validator),
+        validateTime,
+        timeValidation,
         dateValidation,
         numberValidation,
-        timeValidation,
         stateValidation,
         create,
     ],
-    read,
+    read: [asyncErrorBoundary(reservationExists), asyncErrorBoundary(read)],
     update: [
         asyncErrorBoundary(reservationExists),
         updateStatus,
         finishValidation,
-        update,
+        asyncErrorBoundary(update),
+    ],
+    updateReservation: [
+        ...VALID_PROPERTIES.map(validator),
+        asyncErrorBoundary(reservationExists),
+        timeValidation,
+        dateValidation,
+        numberValidation,
+        stateValidation,
+        asyncErrorBoundary(updateReservation),
     ],
 };
