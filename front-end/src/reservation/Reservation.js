@@ -102,7 +102,7 @@ export default function Reservation({
                     name="mobile_number"
                     className="form-control"
                     placeholder="Phone Number"
-                    pattern="^[0-9 -]+$"
+                    pattern="[\d\-]+"
                     value={formData.mobile_number}
                     onChange={handleInput}
                 ></input>
