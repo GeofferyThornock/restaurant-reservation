@@ -55,7 +55,6 @@ export default function Reservation({
 
         if (time >= 2200 || time <= 1030) {
             setError({ message: "Must pick a time during work hours" });
-            console.log(error.message);
             return;
         }
 
@@ -64,8 +63,6 @@ export default function Reservation({
         } else {
             submitHandler(formData);
         }
-
-        setFormData({ ...initialFormData });
     };
 
     const cancelButton = (e) => {
