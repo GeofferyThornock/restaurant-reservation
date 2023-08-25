@@ -115,7 +115,7 @@ The response from the server should look like the following.
 ### Update Reservation
 This route will update a reservation based on an id
 
-```html
+```http
 PUT /reservations/:reservation_id
 ```
 
@@ -142,7 +142,7 @@ The server should respond with updated content
 
 This route will allow you to update a specific reservations status
 
-```html
+```http
 PUT /reservation/:reservation_id
 ```
 
@@ -181,7 +181,7 @@ The response should include the entire reservation with the newly updated status
 
 Gets a list of all Tables
 
-```html
+```http
 GET /tables
 ```
 
@@ -200,7 +200,7 @@ response from the server should be
 
 Creates a new table
 
-```html
+```http
 POST /tables
 ```
 
@@ -227,7 +227,7 @@ response from the server should be the newly created object
 
 Updates a tables status to be Occupied and sets the corrosponding reservation to be "seated"
 
-```html
+```http
 PUT /tables/:table_id/seat
 ```
 
@@ -257,7 +257,7 @@ response from the server should be the newly updated object
 
 Updates a table to be free and updates the reservation to be finished
 
-```html
+```http
 DELETE /tables/:table_id/seat
 ```
 
