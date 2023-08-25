@@ -29,7 +29,7 @@ A fullstack app for a restaurant business to track and manage tables, reservatio
 ### Get Reservations By Date
 
 ```http
-  GET /reservations?date=YYYY-DD-MM
+GET /reservations?date=YYYY-DD-MM
 ```
 
 | Parameter | Type     | Description                       |
@@ -59,7 +59,7 @@ Response should be
 ### Get Reservation
 
 ```http
-  GET /reservations/:reservation_id
+GET /reservations/:reservation_id
 ```
 
 | Parameter | Type     | Description                       |
@@ -143,7 +143,7 @@ The server should respond with updated content
 This route will allow you to update a specific reservations status
 
 ```html
-UPDATE /reservation/:reservation_id
+PUT /reservation/:reservation_id
 ```
 
 | Options    |
